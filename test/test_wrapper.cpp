@@ -45,17 +45,17 @@ int ir_counter_ = 0;
 int color_counter_ = 0;
 int depth_counter_ = 0;
 
-void IRCallback(sensor_msgs::ImagePtr image)
+void IRCallback(openni2::image_t image)
 {
   ++ir_counter_;
 }
 
-void ColorCallback(sensor_msgs::ImagePtr image)
+void ColorCallback(openni2::image_t image)
 {
   ++color_counter_;
 }
 
-void DepthCallback(sensor_msgs::ImagePtr image)
+void DepthCallback(openni2::image_t image)
 {
   ++depth_counter_;
 }
