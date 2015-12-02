@@ -32,8 +32,8 @@
 #include "openni2_camera/openni2_driver.h"
 #include "openni2_camera/openni2_exception.h"
 
-#include <sensor_msgs/image_encodings.h>
-#include <sensor_msgs/distortion_models.h>
+//#include <sensor_msgs/image_encodings.h>
+//#include <sensor_msgs/distortion_models.h>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp>
@@ -41,9 +41,9 @@
 namespace openni2_wrapper
 {
 
-OpenNI2Driver::OpenNI2Driver(ros::NodeHandle& n, ros::NodeHandle& pnh) :
-    nh_(n),
-    pnh_(pnh),
+OpenNI2Driver::OpenNI2Driver() ://ros::NodeHandle& n, ros::NodeHandle& pnh) :
+//    nh_(n),
+//    pnh_(pnh),
     device_manager_(OpenNI2DeviceManager::getSingelton()),
     config_init_(false),
     data_skip_ir_counter_(0),
@@ -62,23 +62,23 @@ OpenNI2Driver::OpenNI2Driver(ros::NodeHandle& n, ros::NodeHandle& pnh) :
   initDevice();
 
   // Initialize dynamic reconfigure
-  reconfigure_server_.reset(new ReconfigureServer(pnh_));
-  reconfigure_server_->setCallback(boost::bind(&OpenNI2Driver::configCb, this, _1, _2));
+//  reconfigure_server_.reset(new ReconfigureServer(pnh_));
+//  reconfigure_server_->setCallback(boost::bind(&OpenNI2Driver::configCb, this, _1, _2));
 
   while (!config_init_)
   {
-    ROS_DEBUG("Waiting for dynamic reconfigure configuration.");
-    boost::this_thread::sleep(boost::posix_time::seconds(0.1));
+//    ROS_DEBUG("Waiting for dynamic reconfigure configuration.");
+//    boost::this_thread::sleep(boost::posix_time::seconds(0.1));
   }
-  ROS_DEBUG("Dynamic reconfigure configuration received.");
+//  ROS_DEBUG("Dynamic reconfigure configuration received.");
 
-  advertiseROSTopics();
+//  advertiseROSTopics();
 
 }
 
 void OpenNI2Driver::advertiseROSTopics()
 {
-
+/*
   // Allow remapping namespaces rgb, ir, depth, depth_registered
   ros::NodeHandle color_nh(nh_, "rgb");
   image_transport::ImageTransport color_it(color_nh);
@@ -140,14 +140,15 @@ void OpenNI2Driver::advertiseROSTopics()
   ir_info_manager_  = boost::make_shared<camera_info_manager::CameraInfoManager>(ir_nh,  ir_name,  ir_info_url_);
 
   get_serial_server = nh_.advertiseService("get_serial", &OpenNI2Driver::getSerialCb,this);
-
+*/
 }
 
-bool OpenNI2Driver::getSerialCb(openni2_camera::GetSerialRequest& req, openni2_camera::GetSerialResponse& res) {
-  res.serial = device_manager_->getSerial(device_->getUri());
-  return true;
-}
+//bool OpenNI2Driver::getSerialCb(openni2_camera::GetSerialRequest& req, openni2_camera::GetSerialResponse& res) {
+//  res.serial = device_manager_->getSerial(device_->getUri());
+//  return true;
+//}
 
+/*
 void OpenNI2Driver::configCb(Config &config, uint32_t level)
 {
   bool stream_reset = false;
@@ -201,6 +202,7 @@ void OpenNI2Driver::configCb(Config &config, uint32_t level)
 
   old_config_ = config;
 }
+*/
 
 void OpenNI2Driver::setIRVideoMode(const OpenNI2VideoMode& ir_video_mode)
 {
@@ -214,7 +216,7 @@ void OpenNI2Driver::setIRVideoMode(const OpenNI2VideoMode& ir_video_mode)
   }
   else
   {
-    ROS_ERROR_STREAM("Unsupported IR video mode - " << ir_video_mode);
+    //ROS_ERROR_STREAM("Unsupported IR video mode - " << ir_video_mode);
   }
 }
 void OpenNI2Driver::setColorVideoMode(const OpenNI2VideoMode& color_video_mode)
@@ -228,7 +230,7 @@ void OpenNI2Driver::setColorVideoMode(const OpenNI2VideoMode& color_video_mode)
   }
   else
   {
-    ROS_ERROR_STREAM("Unsupported color video mode - " << color_video_mode);
+    //ROS_ERROR_STREAM("Unsupported color video mode - " << color_video_mode);
   }
 }
 void OpenNI2Driver::setDepthVideoMode(const OpenNI2VideoMode& depth_video_mode)
@@ -242,10 +244,11 @@ void OpenNI2Driver::setDepthVideoMode(const OpenNI2VideoMode& depth_video_mode)
   }
   else
   {
-    ROS_ERROR_STREAM("Unsupported depth video mode - " << depth_video_mode);
+    //ROS_ERROR_STREAM("Unsupported depth video mode - " << depth_video_mode);
   }
 }
 
+/*
 void OpenNI2Driver::applyConfigToOpenNIDevice()
 {
 
@@ -266,7 +269,7 @@ void OpenNI2Driver::applyConfigToOpenNIDevice()
     }
     catch (const OpenNI2Exception& exception)
     {
-      ROS_ERROR("Could not set image registration. Reason: %s", exception.what());
+     // ROS_ERROR("Could not set image registration. Reason: %s", exception.what());
     }
   }
 
@@ -277,7 +280,7 @@ void OpenNI2Driver::applyConfigToOpenNIDevice()
   }
   catch (const OpenNI2Exception& exception)
   {
-    ROS_ERROR("Could not set color depth synchronization. Reason: %s", exception.what());
+    //ROS_ERROR("Could not set color depth synchronization. Reason: %s", exception.what());
   }
 
   try
@@ -287,7 +290,7 @@ void OpenNI2Driver::applyConfigToOpenNIDevice()
   }
   catch (const OpenNI2Exception& exception)
   {
-    ROS_ERROR("Could not set auto exposure. Reason: %s", exception.what());
+    //ROS_ERROR("Could not set auto exposure. Reason: %s", exception.what());
   }
 
   try
@@ -297,49 +300,50 @@ void OpenNI2Driver::applyConfigToOpenNIDevice()
   }
   catch (const OpenNI2Exception& exception)
   {
-    ROS_ERROR("Could not set auto white balance. Reason: %s", exception.what());
+   // ROS_ERROR("Could not set auto white balance. Reason: %s", exception.what());
   }
 
   device_->setUseDeviceTimer(use_device_time_);
 
 }
+*/
 
 void OpenNI2Driver::colorConnectCb()
 {
   boost::lock_guard<boost::mutex> lock(connect_mutex_);
 
-  color_subscribers_ = pub_color_.getNumSubscribers() > 0;
+ // color_subscribers_ = pub_color_.getNumSubscribers() > 0;
 
   if (color_subscribers_ && !device_->isColorStreamStarted())
   {
     // Can't stream IR and RGB at the same time. Give RGB preference.
     if (device_->isIRStreamStarted())
     {
-      ROS_ERROR("Cannot stream RGB and IR at the same time. Streaming RGB only.");
-      ROS_INFO("Stopping IR stream.");
+     // ROS_ERROR("Cannot stream RGB and IR at the same time. Streaming RGB only.");
+     // ROS_INFO("Stopping IR stream.");
       device_->stopIRStream();
     }
 
-    device_->setColorFrameCallback(boost::bind(&OpenNI2Driver::newColorFrameCallback, this, _1));
+  //  device_->setColorFrameCallback(boost::bind(&OpenNI2Driver::newColorFrameCallback, this, _1));
 
-    ROS_INFO("Starting color stream.");
+   // ROS_INFO("Starting color stream.");
     device_->startColorStream();
 
   }
   else if (!color_subscribers_ && device_->isColorStreamStarted())
   {
-    ROS_INFO("Stopping color stream.");
+    //ROS_INFO("Stopping color stream.");
     device_->stopColorStream();
 
     // Start IR if it's been blocked on RGB subscribers
-    bool need_ir = pub_ir_.getNumSubscribers() > 0;
-    if (need_ir && !device_->isIRStreamStarted())
-    {
-      device_->setIRFrameCallback(boost::bind(&OpenNI2Driver::newIRFrameCallback, this, _1));
+  //  bool need_ir = pub_ir_.getNumSubscribers() > 0;
+  //  if (need_ir && !device_->isIRStreamStarted())
+  //  {
+   //   device_->setIRFrameCallback(boost::bind(&OpenNI2Driver::newIRFrameCallback, this, _1));
 
-      ROS_INFO("Starting IR stream.");
-      device_->startIRStream();
-    }
+    //  ROS_INFO("Starting IR stream.");
+  //    device_->startIRStream();
+   // }
   }
 }
 
@@ -347,21 +351,21 @@ void OpenNI2Driver::depthConnectCb()
 {
   boost::lock_guard<boost::mutex> lock(connect_mutex_);
 
-  depth_subscribers_ = pub_depth_.getNumSubscribers() > 0;
-  depth_raw_subscribers_ = pub_depth_raw_.getNumSubscribers() > 0;
+//  depth_subscribers_ = pub_depth_.getNumSubscribers() > 0;
+//  depth_raw_subscribers_ = pub_depth_raw_.getNumSubscribers() > 0;
 
   bool need_depth = depth_subscribers_ || depth_raw_subscribers_;
 
   if (need_depth && !device_->isDepthStreamStarted())
   {
-    device_->setDepthFrameCallback(boost::bind(&OpenNI2Driver::newDepthFrameCallback, this, _1));
+//    device_->setDepthFrameCallback(boost::bind(&OpenNI2Driver::newDepthFrameCallback, this, _1));
 
-    ROS_INFO("Starting depth stream.");
+   // ROS_INFO("Starting depth stream.");
     device_->startDepthStream();
   }
   else if (!need_depth && device_->isDepthStreamStarted())
   {
-    ROS_INFO("Stopping depth stream.");
+  //  ROS_INFO("Stopping depth stream.");
     device_->stopDepthStream();
   }
 }
@@ -370,30 +374,31 @@ void OpenNI2Driver::irConnectCb()
 {
   boost::lock_guard<boost::mutex> lock(connect_mutex_);
 
-  ir_subscribers_ = pub_ir_.getNumSubscribers() > 0;
+//  ir_subscribers_ = pub_ir_.getNumSubscribers() > 0;
 
   if (ir_subscribers_ && !device_->isIRStreamStarted())
   {
     // Can't stream IR and RGB at the same time
     if (device_->isColorStreamStarted())
     {
-      ROS_ERROR("Cannot stream RGB and IR at the same time. Streaming RGB only.");
+   //   ROS_ERROR("Cannot stream RGB and IR at the same time. Streaming RGB only.");
     }
     else
     {
-      device_->setIRFrameCallback(boost::bind(&OpenNI2Driver::newIRFrameCallback, this, _1));
+//      device_->setIRFrameCallback(boost::bind(&OpenNI2Driver::newIRFrameCallback, this, _1));
 
-      ROS_INFO("Starting IR stream.");
+    //  ROS_INFO("Starting IR stream.");
       device_->startIRStream();
     }
   }
   else if (!ir_subscribers_ && device_->isIRStreamStarted())
   {
-    ROS_INFO("Stopping IR stream.");
+  //  ROS_INFO("Stopping IR stream.");
     device_->stopIRStream();
   }
 }
 
+/*
 void OpenNI2Driver::newIRFrameCallback(sensor_msgs::ImagePtr image)
 {
   if ((++data_skip_ir_counter_)%data_skip_==0)
@@ -409,7 +414,9 @@ void OpenNI2Driver::newIRFrameCallback(sensor_msgs::ImagePtr image)
     }
   }
 }
+*/
 
+/*
 void OpenNI2Driver::newColorFrameCallback(sensor_msgs::ImagePtr image)
 {
   if ((++data_skip_color_counter_)%data_skip_==0)
@@ -425,7 +432,9 @@ void OpenNI2Driver::newColorFrameCallback(sensor_msgs::ImagePtr image)
     }
   }
 }
+*/
 
+/*
 void OpenNI2Driver::newDepthFrameCallback(sensor_msgs::ImagePtr image)
 {
   if ((++data_skip_depth_counter_)%data_skip_==0)
@@ -478,8 +487,10 @@ void OpenNI2Driver::newDepthFrameCallback(sensor_msgs::ImagePtr image)
     }
   }
 }
+*/
 
 // Methods to get calibration parameters for the various cameras
+/*
 sensor_msgs::CameraInfoPtr OpenNI2Driver::getDefaultCameraInfo(int width, int height, double f) const
 {
   sensor_msgs::CameraInfoPtr info = boost::make_shared<sensor_msgs::CameraInfo>();
@@ -513,8 +524,10 @@ sensor_msgs::CameraInfoPtr OpenNI2Driver::getDefaultCameraInfo(int width, int he
 
   return info;
 }
+*/
 
 /// @todo Use binning/ROI properly in publishing camera infos
+/*
 sensor_msgs::CameraInfoPtr OpenNI2Driver::getColorCameraInfo(int width, int height, ros::Time time) const
 {
   sensor_msgs::CameraInfoPtr info;
@@ -541,8 +554,9 @@ sensor_msgs::CameraInfoPtr OpenNI2Driver::getColorCameraInfo(int width, int heig
 
   return info;
 }
+*/
 
-
+/*
 sensor_msgs::CameraInfoPtr OpenNI2Driver::getIRCameraInfo(int width, int height, ros::Time time) const
 {
   sensor_msgs::CameraInfoPtr info;
@@ -587,26 +601,27 @@ sensor_msgs::CameraInfoPtr OpenNI2Driver::getDepthCameraInfo(int width, int heig
   /// @todo Could put this in projector frame so as to encode the baseline in P[3]
   return info;
 }
+*/
 
 void OpenNI2Driver::readConfigFromParameterServer()
 {
-  if (!pnh_.getParam("device_id", device_id_))
-  {
-    ROS_WARN ("~device_id is not set! Using first device.");
+//  if (!pnh_.getParam("device_id", device_id_))
+//  {
+//    ROS_WARN ("~device_id is not set! Using first device.");
     device_id_ = "#1";
-  }
+//  }
 
   // Camera TF frames
-  pnh_.param("ir_frame_id", ir_frame_id_, std::string("/openni_ir_optical_frame"));
-  pnh_.param("rgb_frame_id", color_frame_id_, std::string("/openni_rgb_optical_frame"));
-  pnh_.param("depth_frame_id", depth_frame_id_, std::string("/openni_depth_optical_frame"));
+//  pnh_.param("ir_frame_id", ir_frame_id_, std::string("/openni_ir_optical_frame"));
+//  pnh_.param("rgb_frame_id", color_frame_id_, std::string("/openni_rgb_optical_frame"));
+//  pnh_.param("depth_frame_id", depth_frame_id_, std::string("/openni_depth_optical_frame"));
 
-  ROS_DEBUG("ir_frame_id = '%s' ", ir_frame_id_.c_str());
-  ROS_DEBUG("rgb_frame_id = '%s' ", color_frame_id_.c_str());
-  ROS_DEBUG("depth_frame_id = '%s' ", depth_frame_id_.c_str());
+//  ROS_DEBUG("ir_frame_id = '%s' ", ir_frame_id_.c_str());
+//  ROS_DEBUG("rgb_frame_id = '%s' ", color_frame_id_.c_str());
+//  ROS_DEBUG("depth_frame_id = '%s' ", depth_frame_id_.c_str());
 
-  pnh_.param("rgb_camera_info_url", color_info_url_, std::string());
-  pnh_.param("depth_camera_info_url", ir_info_url_, std::string());
+//  pnh_.param("rgb_camera_info_url", color_info_url_, std::string());
+//  pnh_.param("depth_camera_info_url", ir_info_url_, std::string());
 
 }
 
@@ -686,13 +701,13 @@ std::string OpenNI2Driver::resolveDeviceURI(const std::string& device_id) throw(
         it != available_device_URIs->end(); ++it)
     {
       try {
-        std::string serial = device_manager_->getSerial(*it);
+        std::string serial;// = device_manager_->getSerial(*it);
         if (serial.size() > 0 && device_id == serial)
           return *it;
       }
       catch (const OpenNI2Exception& exception)
       {
-        ROS_WARN("Could not query serial number of device \"%s\":", exception.what());
+//        ROS_WARN("Could not query serial number of device \"%s\":", exception.what());
       }
     }
 
@@ -722,7 +737,8 @@ std::string OpenNI2Driver::resolveDeviceURI(const std::string& device_id) throw(
 
 void OpenNI2Driver::initDevice()
 {
-  while (ros::ok() && !device_)
+//  while (ros::ok() && !device_)
+  while (!device_)
   {
     try
     {
@@ -733,21 +749,22 @@ void OpenNI2Driver::initDevice()
     {
       if (!device_)
       {
-        ROS_INFO("No matching device found.... waiting for devices. Reason: %s", exception.what());
+//        ROS_INFO("No matching device found.... waiting for devices. Reason: %s", exception.what());
         boost::this_thread::sleep(boost::posix_time::seconds(3));
         continue;
       }
       else
       {
-        ROS_ERROR("Could not retrieve device. Reason: %s", exception.what());
+//        ROS_ERROR("Could not retrieve device. Reason: %s", exception.what());
         exit(-1);
       }
     }
   }
 
-  while (ros::ok() && !device_->isValid())
+  while (!device_->isValid())
+//  while (ros::ok() && !device_->isValid())
   {
-    ROS_DEBUG("Waiting for device initialization..");
+//    ROS_DEBUG("Waiting for device initialization..");
     boost::this_thread::sleep(boost::posix_time::seconds(0.1));
   }
 
@@ -879,6 +896,7 @@ int OpenNI2Driver::lookupVideoModeFromDynConfig(int mode_nr, OpenNI2VideoMode& v
   return ret;
 }
 
+/*
 sensor_msgs::ImageConstPtr OpenNI2Driver::rawToFloatingPointConversion(sensor_msgs::ImageConstPtr raw_image)
 {
   static const float bad_point = std::numeric_limits<float>::quiet_NaN ();
@@ -911,5 +929,6 @@ sensor_msgs::ImageConstPtr OpenNI2Driver::rawToFloatingPointConversion(sensor_ms
 
   return new_image;
 }
+*/
 
 }
