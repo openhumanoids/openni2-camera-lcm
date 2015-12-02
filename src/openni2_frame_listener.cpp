@@ -33,11 +33,20 @@
 #include "openni2_camera/openni2_frame_listener.h"
 #include "openni2_camera/openni2_timer_filter.h"
 
+#include <sys/time.h>
 //#include <sensor_msgs/image_encodings.h>
 
 //#include <ros/ros.h>
 
 #define TIME_FILTER_LENGTH 15
+
+// from libbot
+int64_t _timestamp_now()
+{
+    struct timeval tv;
+    gettimeofday (&tv, NULL);
+    return (int64_t) tv.tv_sec * 1000000 + tv.tv_usec;
+}
 
 namespace openni2_wrapper
 {
@@ -46,7 +55,7 @@ OpenNI2FrameListener::OpenNI2FrameListener() :
     callback_(0),
     user_device_timer_(false),
     timer_filter_(new OpenNI2TimerFilter(TIME_FILTER_LENGTH)),
-    prev_time_stamp_(0.0)
+    prev_utime_(0)
 {
   //ros::Time::init();
 }
@@ -68,23 +77,23 @@ void OpenNI2FrameListener::onNewFrame(openni::VideoStream& stream)
 //    sensor_msgs::ImagePtr image(new sensor_msgs::Image);
       openni2::image_t* image(new openni2::image_t);
 
-    //ros::Time ros_now = ros::Time::now();
+      int64_t ros_now = _timestamp_now();//ros::Time::now();
 
     if (!user_device_timer_)
     {
-  //    image->header.stamp = ros_now;
+        image->utime  = ros_now;
 
     //  ROS_DEBUG("Time interval between frames: %.4f ms", (float)((ros_now.toSec()-prev_time_stamp_)*1000.0));
 
-//      prev_time_stamp_ = ros_now.toSec();
+        prev_utime_ = ros_now;//.toSec();
     } else
     {
       uint64_t device_time = m_frame.getTimestamp();
 
       double device_time_in_sec = static_cast<double>(device_time)/1000000.0;
-//      double ros_time_in_sec = ros_now.toSec();
+      double ros_time_in_sec = double(ros_now*1E-6);
 
-      double time_diff;// = ros_time_in_sec-device_time_in_sec;
+      double time_diff = ros_time_in_sec-device_time_in_sec;
 
       timer_filter_->addSample(time_diff);
 
@@ -92,17 +101,21 @@ void OpenNI2FrameListener::onNewFrame(openni::VideoStream& stream)
 
       double corrected_timestamp = device_time_in_sec+filtered_time_diff;
 
+      image->utime = corrected_timestamp*1E6;
 //      image->header.stamp.fromSec(corrected_timestamp);
 
 //      ROS_DEBUG("Time interval between frames: %.4f ms", (float)((corrected_timestamp-prev_time_stamp_)*1000.0));
 
-      prev_time_stamp_ = corrected_timestamp;
+      prev_utime_ = corrected_timestamp;
     }
 
     image->width = m_frame.getWidth();
     image->height = m_frame.getHeight();
 
     std::size_t data_size = m_frame.getDataSize();
+
+    image->nmetadata =0;
+    image->size = 0;
 
 //    image->data.resize(data_size);
 //    memcpy(&image->data[0], m_frame.getData(), data_size);

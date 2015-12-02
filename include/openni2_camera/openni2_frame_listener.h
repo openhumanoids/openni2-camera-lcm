@@ -71,7 +71,7 @@ private:
   bool user_device_timer_;
   boost::shared_ptr<OpenNI2TimerFilter> timer_filter_;
 
-  double prev_time_stamp_;
+  int64_t prev_utime_;
 };
 
 }

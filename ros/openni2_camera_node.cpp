@@ -31,14 +31,21 @@
 
 #include "openni2_camera/openni2_driver.h"
 #include <boost/thread/thread.hpp>
+#include <lcm/lcm-cpp.hpp>
+
 int main(int argc, char **argv){
 
 //  ros::init(argc, argv, "openni2_camera");
 //  ros::NodeHandle n;
 //  ros::NodeHandle pnh("~");
 
+  boost::shared_ptr<lcm::LCM> lcm(new lcm::LCM);
+  if(!lcm->good()){
+    std::cerr <<"ERROR: lcm is not good()" <<std::endl;
+  }
+
   std::cout << "a\n";
-  openni2_wrapper::OpenNI2Driver drv(1);//n, pnh);
+  openni2_wrapper::OpenNI2Driver drv(lcm);//n, pnh);
   std::cout << "b\n";
 
     boost::this_thread::sleep(boost::posix_time::milliseconds(10000));

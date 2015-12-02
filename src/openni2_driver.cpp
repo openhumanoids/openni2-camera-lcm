@@ -41,9 +41,8 @@
 namespace openni2_wrapper
 {
 
-OpenNI2Driver::OpenNI2Driver(int temp) ://ros::NodeHandle& n, ros::NodeHandle& pnh) :
-//    nh_(n),
-//    pnh_(pnh),
+OpenNI2Driver::OpenNI2Driver(boost::shared_ptr<lcm::LCM>& lcm) ://ros::NodeHandle& n, ros::NodeHandle& pnh) :
+    lcm_(lcm),
     device_manager_(OpenNI2DeviceManager::getSingelton()),
     config_init_(false), // was false
     data_skip_ir_counter_(0),
@@ -193,6 +192,10 @@ void OpenNI2Driver::configCb(uint32_t level)//Config &config, uint32_t level)
   //color_time_offset_ = 0;//ros::Duration(config.color_time_offset);
   //depth_time_offset_ = 0;//ros::Duration(config.depth_time_offset);
 
+   lookupVideoModeFromDynConfig(5, ir_video_mode_);
+lookupVideoModeFromDynConfig(5, color_video_mode_);
+lookupVideoModeFromDynConfig(5, depth_video_mode_);
+
  // if (lookupVideoModeFromDynConfig(config.ir_mode, ir_video_mode_)<0)
  // {
  //   ROS_ERROR("Undefined IR video mode received from dynamic reconfigure");
@@ -225,7 +228,7 @@ void OpenNI2Driver::configCb(uint32_t level)//Config &config, uint32_t level)
 
 //  use_device_time_ = config.use_device_time;
 
-//  data_skip_ = config.data_skip+1;
+  data_skip_ = 1;// config.data_skip+1;
 
   applyConfigToOpenNIDevice();
 
@@ -456,7 +459,7 @@ void OpenNI2Driver::newIRFrameCallback(openni2::image_t* image)
 void OpenNI2Driver::newColorFrameCallback(openni2::image_t* image)
 {
   std::cout << "publish color callback\n";
-/*
+
   if ((++data_skip_color_counter_)%data_skip_==0)
   {
     data_skip_color_counter_ = 0;
@@ -466,10 +469,11 @@ void OpenNI2Driver::newColorFrameCallback(openni2::image_t* image)
     //  image->header.frame_id = color_frame_id_;
     //  image->header.stamp = image->header.stamp + color_time_offset_;
 
+        lcm_->publish("COLOR", image);
     //  pub_color_.publish(image, getColorCameraInfo(image->width, image->height, image->header.stamp));
     }
   }
-*/
+
 }
 
 

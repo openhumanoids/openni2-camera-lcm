@@ -54,6 +54,7 @@
 #include "openni2_camera/openni2_video_mode.h"
 //#include "openni2_camera/GetSerial.h"
 
+#include <lcm/lcm-cpp.hpp>
 //#include <ros/ros.h>
 
 namespace openni2_wrapper
@@ -62,9 +63,10 @@ namespace openni2_wrapper
 class OpenNI2Driver
 {
 public:
-  OpenNI2Driver(int temp);//ros::NodeHandle& n, ros::NodeHandle& pnh) ;
+  OpenNI2Driver(boost::shared_ptr<lcm::LCM>& lcm_);//ros::NodeHandle& n, ros::NodeHandle& pnh) ;
 
 private:
+  boost::shared_ptr<lcm::LCM> lcm_;
 //  typedef openni2_camera::OpenNI2Config Config;
 //  typedef dynamic_reconfigure::Server<Config> ReconfigureServer;
 
