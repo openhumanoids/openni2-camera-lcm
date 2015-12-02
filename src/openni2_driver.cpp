@@ -51,7 +51,8 @@ OpenNI2Driver::OpenNI2Driver(boost::shared_ptr<lcm::LCM>& lcm) ://ros::NodeHandl
     ir_subscribers_(false),
     color_subscribers_(true),
     depth_subscribers_(true),
-    depth_raw_subscribers_(false)
+    depth_raw_subscribers_(false),
+    last_color_image_init_(false)
 {
   std::cout << "top\n";
 
@@ -132,8 +133,8 @@ std::cout << "connect depth\n";
 //    pub_depth_ = depth_raw_it.advertiseCamera("image", 1, itssc, itssc, rssc, rssc);
   }
 
-    device_->startColorStream();
     device_->startDepthStream();
+    device_->startColorStream();
 
  // if (color_subscribers_ && !device_->isColorStreamStarted())
  // {
@@ -471,6 +472,9 @@ void OpenNI2Driver::newColorFrameCallback(openni2::image_t* image)
 
         lcm_->publish("COLOR", image);
     //  pub_color_.publish(image, getColorCameraInfo(image->width, image->height, image->header.stamp));
+
+        last_color_image_ = *image;
+        last_color_image_init_ = true;
     }
   }
 
@@ -481,7 +485,7 @@ void OpenNI2Driver::newColorFrameCallback(openni2::image_t* image)
 void OpenNI2Driver::newDepthFrameCallback(openni2::image_t* image)
 {
   std::cout << "publish depth callback\n";
-/*
+
   if ((++data_skip_depth_counter_)%data_skip_==0)
   {
 
@@ -489,7 +493,7 @@ void OpenNI2Driver::newDepthFrameCallback(openni2::image_t* image)
 
     if (depth_raw_subscribers_||depth_subscribers_)
     {
-      image->header.stamp = image->header.stamp + depth_time_offset_;
+      //image->header.stamp = image->header.stamp + depth_time_offset_;
 
       if (z_offset_mm_ != 0)
       {
@@ -507,30 +511,44 @@ void OpenNI2Driver::newDepthFrameCallback(openni2::image_t* image)
                 data[i] = static_cast<uint16_t>(data[i] * z_scaling_);
       }
 
-      sensor_msgs::CameraInfoPtr cam_info;
+      //sensor_msgs::CameraInfoPtr cam_info;
 
-      if (depth_registration_)
-      {
-        image->header.frame_id = color_frame_id_;
-        cam_info = getColorCameraInfo(image->width,image->height, image->header.stamp);
-      } else
-      {
-        image->header.frame_id = depth_frame_id_;
-        cam_info = getDepthCameraInfo(image->width,image->height, image->header.stamp);
-      }
+      //if (depth_registration_)
+      //{
+      //  image->header.frame_id = color_frame_id_;
+      //  cam_info = getColorCameraInfo(image->width,image->height, image->header.stamp);
+      //} else
+      //{
+      //  image->header.frame_id = depth_frame_id_;
+      //  cam_info = getDepthCameraInfo(image->width,image->height, image->header.stamp);
+      //}
 
-      if (depth_raw_subscribers_)
-      {
-        pub_depth_raw_.publish(image, cam_info);
-      }
+      lcm_->publish("DEPTH", image);
 
-      if (depth_subscribers_ )
-      {
-        sensor_msgs::ImageConstPtr floating_point_image = rawToFloatingPointConversion(image);
-        pub_depth_.publish(floating_point_image, cam_info);
+      if (last_color_image_init_){
+      openni2::images_t images;
+      images.utime = image->utime;
+      images.n_images = 2;
+      images.images.push_back(last_color_image_);
+      images.images.push_back(*image);
+      images.image_types.push_back( 0 ) ;//LEFT = 0
+      images.image_types.push_back( 4 ) ;//DEPTH_MM = 4
+
+      lcm_->publish("CAMERA", &images);
       }
+      //if (depth_raw_subscribers_)
+      //{
+      //  pub_depth_raw_.publish(image, cam_info);
+      //  lcm_->publish("COLOR", image);
+      //}
+
+      //if (depth_subscribers_ )
+      //{
+       // sensor_msgs::ImageConstPtr floating_point_image = rawToFloatingPointConversion(image);
+      //  pub_depth_.publish(floating_point_image, cam_info);
+      //}
     }
-  } */
+  } 
 }
 
 

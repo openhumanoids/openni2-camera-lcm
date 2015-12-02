@@ -115,10 +115,10 @@ void OpenNI2FrameListener::onNewFrame(openni::VideoStream& stream)
     std::size_t data_size = m_frame.getDataSize();
 
     image->nmetadata =0;
-    image->size = 0;
 
-//    image->data.resize(data_size);
-//    memcpy(&image->data[0], m_frame.getData(), data_size);
+    image->data.resize(data_size);
+    memcpy(&image->data[0], m_frame.getData(), data_size);
+    image->size = data_size;
 
 //    image->is_bigendian = 0;
 
@@ -126,7 +126,10 @@ void OpenNI2FrameListener::onNewFrame(openni::VideoStream& stream)
     switch (video_mode.getPixelFormat())
     {
       case openni::PIXEL_FORMAT_DEPTH_1_MM:
+        printf( "%d\n",image->width);
         printf( "\nme got data 1mm\n");
+        image->pixelformat = openni2::image_t::PIXEL_FORMAT_INVALID; // depth is not encoded typically
+        image->row_stride = sizeof(unsigned char) * 2 * image->width;
         //image->encoding = sensor_msgs::image_encodings::TYPE_16UC1;
         //image->step = sizeof(unsigned char) * 2 * image->width;
         break;
@@ -148,7 +151,8 @@ void OpenNI2FrameListener::onNewFrame(openni::VideoStream& stream)
 
       case openni::PIXEL_FORMAT_RGB888:
         printf( "\nme got data 88\n");
-        //image->encoding = sensor_msgs::image_encodings::RGB8;
+        image->pixelformat = openni2::image_t::PIXEL_FORMAT_RGB; // sensor_msgs::image_encodings::RGB8;
+        image->row_stride = sizeof(unsigned char) * 3 * image->width;
         //image->step = sizeof(unsigned char) * 3 * image->width;
         break;
       case openni::PIXEL_FORMAT_YUV422:

@@ -39,7 +39,7 @@
 
 //#include <sensor_msgs/Image.h>
 #include <lcmtypes/openni2/image_t.hpp>
-
+#include <lcmtypes/openni2/images_t.hpp>
 //#include <dynamic_reconfigure/server.h>
 //#include <openni2_camera/OpenNI2Config.h>
 
@@ -178,6 +178,8 @@ private:
 
   bool use_device_time_;
 
+  openni2::image_t last_color_image_;
+  bool last_color_image_init_;
 //  Config old_config_;
 };
 
