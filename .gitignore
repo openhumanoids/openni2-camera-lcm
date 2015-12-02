@@ -1,0 +1,7 @@
+/pod-build
+lcmtypes/c/
+lcmtypes/cpp/
+lcmtypes/cpp/
+lcmtypes/java/
+lcmtypes/python/
+*~
