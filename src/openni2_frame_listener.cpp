@@ -57,7 +57,6 @@ OpenNI2FrameListener::OpenNI2FrameListener() :
     timer_filter_(new OpenNI2TimerFilter(TIME_FILTER_LENGTH)),
     prev_utime_(0)
 {
-  //ros::Time::init();
 }
 
 bool OpenNI2FrameListener::setUseDeviceTimer(bool enable)
@@ -74,7 +73,6 @@ void OpenNI2FrameListener::onNewFrame(openni::VideoStream& stream)
 
   if (m_frame.isValid() && callback_)
   {
-//    sensor_msgs::ImagePtr image(new sensor_msgs::Image);
       openni2::image_t* image(new openni2::image_t);
 
       int64_t ros_now = _timestamp_now();//ros::Time::now();
@@ -83,7 +81,7 @@ void OpenNI2FrameListener::onNewFrame(openni::VideoStream& stream)
     {
         image->utime  = ros_now;
 
-    //  ROS_DEBUG("Time interval between frames: %.4f ms", (float)((ros_now.toSec()-prev_time_stamp_)*1000.0));
+        // ROS_DEBUG("Time interval between frames: %.4f ms", (float)((ros_now.toSec()-prev_time_stamp_)*1000.0));
 
         prev_utime_ = ros_now;//.toSec();
     } else
@@ -102,9 +100,9 @@ void OpenNI2FrameListener::onNewFrame(openni::VideoStream& stream)
       double corrected_timestamp = device_time_in_sec+filtered_time_diff;
 
       image->utime = corrected_timestamp*1E6;
-//      image->header.stamp.fromSec(corrected_timestamp);
+      // image->header.stamp.fromSec(corrected_timestamp);
 
-//      ROS_DEBUG("Time interval between frames: %.4f ms", (float)((corrected_timestamp-prev_time_stamp_)*1000.0));
+      // ROS_DEBUG("Time interval between frames: %.4f ms", (float)((corrected_timestamp-prev_time_stamp_)*1000.0));
 
       prev_utime_ = corrected_timestamp;
     }
@@ -120,58 +118,49 @@ void OpenNI2FrameListener::onNewFrame(openni::VideoStream& stream)
     memcpy(&image->data[0], m_frame.getData(), data_size);
     image->size = data_size;
 
-//    image->is_bigendian = 0;
+    // image->is_bigendian = 0;
 
     const openni::VideoMode& video_mode = m_frame.getVideoMode();
     switch (video_mode.getPixelFormat())
     {
       case openni::PIXEL_FORMAT_DEPTH_1_MM:
-        printf( "%d\n",image->width);
-        printf( "\nme got data 1mm\n");
-        image->pixelformat = openni2::image_t::PIXEL_FORMAT_INVALID; // depth is not encoded typically
+        // depth is not encoded in the typical manner, so there are not formats
+        image->pixelformat = openni2::image_t::PIXEL_FORMAT_INVALID; 
         image->row_stride = sizeof(unsigned char) * 2 * image->width;
         //image->encoding = sensor_msgs::image_encodings::TYPE_16UC1;
         //image->step = sizeof(unsigned char) * 2 * image->width;
         break;
       case openni::PIXEL_FORMAT_DEPTH_100_UM:
-        printf( "me got data 100um\n");
         //image->encoding = sensor_msgs::image_encodings::TYPE_16UC1;
         //image->step = sizeof(unsigned char) * 2 * image->width;
         break;
       case openni::PIXEL_FORMAT_SHIFT_9_2:
-        printf( "me got data 92\n");
         //image->encoding = sensor_msgs::image_encodings::TYPE_16UC1;
         //image->step = sizeof(unsigned char) * 2 * image->width;
         break;
       case openni::PIXEL_FORMAT_SHIFT_9_3:
-        printf( "me got data 93\n");
         //image->encoding = sensor_msgs::image_encodings::TYPE_16UC1;
         //image->step = sizeof(unsigned char) * 2 * image->width;
         break;
 
       case openni::PIXEL_FORMAT_RGB888:
-        printf( "\nme got data 88\n");
-        image->pixelformat = openni2::image_t::PIXEL_FORMAT_RGB; // sensor_msgs::image_encodings::RGB8;
+        image->pixelformat = openni2::image_t::PIXEL_FORMAT_RGB;
         image->row_stride = sizeof(unsigned char) * 3 * image->width;
         //image->step = sizeof(unsigned char) * 3 * image->width;
         break;
       case openni::PIXEL_FORMAT_YUV422:
-        printf( "me got data 422\n");
         //image->encoding = sensor_msgs::image_encodings::YUV422;
         //image->step = sizeof(unsigned char) * 4 * image->width;
         break;
       case openni::PIXEL_FORMAT_GRAY8:
-        printf( "me got data gray8\n");
         //image->encoding = sensor_msgs::image_encodings::MONO8;
         //image->step = sizeof(unsigned char) * 1 * image->width;
         break;
       case openni::PIXEL_FORMAT_GRAY16:
-        printf( "me got data gtay16\n");
         //image->encoding = sensor_msgs::image_encodings::MONO16;
         //image->step = sizeof(unsigned char) * 2 * image->width;
         break;
       case openni::PIXEL_FORMAT_JPEG:
-        printf( "me got data jpeg\n");
       default:
         printf("Invalid image encoding");
         break;

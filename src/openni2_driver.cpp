@@ -54,7 +54,6 @@ OpenNI2Driver::OpenNI2Driver(boost::shared_ptr<lcm::LCM>& lcm) ://ros::NodeHandl
     depth_raw_subscribers_(false),
     last_color_image_init_(false)
 {
-  std::cout << "top\n";
 
   genVideoModeTableMap();
 
@@ -81,7 +80,6 @@ OpenNI2Driver::OpenNI2Driver(boost::shared_ptr<lcm::LCM>& lcm) ://ros::NodeHandl
 
 void OpenNI2Driver::advertiseROSTopics()
 {
-std::cout << "advertise top\n";
 /*
   // Allow remapping namespaces rgb, ir, depth, depth_registered
   ros::NodeHandle color_nh(nh_, "rgb");
@@ -100,12 +98,11 @@ std::cout << "advertise top\n";
   // the depth generator.
   boost::lock_guard<boost::mutex> lock(connect_mutex_);
 
-std::cout << "advertise\n";
 
   // Asus Xtion PRO does not have an RGB camera
   if (device_->hasColorSensor())
   {
-std::cout << "connect color\n";
+
 //    device_->setIRFrameCallback(boost::bind(&IRCallback, _1));
     device_->setColorFrameCallback(boost::bind(&OpenNI2Driver::colorConnectCb, this));
 //    device_->setDepthFrameCallback(boost::bind(&DepthCallback, _1));
@@ -125,7 +122,6 @@ std::cout << "connect color\n";
 
   if (device_->hasDepthSensor())
   {
-std::cout << "connect depth\n";
 	    device_->setDepthFrameCallback(boost::bind(&OpenNI2Driver::depthConnectCb, this));
 //    image_transport::SubscriberStatusCallback itssc = boost::bind(&OpenNI2Driver::depthConnectCb, this);
 //    ros::SubscriberStatusCallback rssc = boost::bind(&OpenNI2Driver::depthConnectCb, this);
@@ -186,8 +182,8 @@ void OpenNI2Driver::configCb(uint32_t level)//Config &config, uint32_t level)
 
   //depth_ir_offset_x_ = config.depth_ir_offset_x;
   //depth_ir_offset_y_ = config.depth_ir_offset_y;
-  //z_offset_mm_ = config.z_offset_mm;
-  //z_scaling_ = config.z_scaling;
+  z_offset_mm_ = 0;// config.z_offset_mm;
+  z_scaling_ = 1;// default from dynamic reconfigure config.z_scaling;
 
   //ir_time_offset_ = 0;//ros::Duration(config.ir_time_offset);
   //color_time_offset_ = 0;//ros::Duration(config.color_time_offset);
@@ -388,7 +384,6 @@ void OpenNI2Driver::colorConnectCb()
 
 void OpenNI2Driver::depthConnectCb()
 {
-  printf("depthConnectCb top\n");
   boost::lock_guard<boost::mutex> lock(connect_mutex_);
 
   depth_subscribers_ = true;// pub_depth_.getNumSubscribers() > 0;
@@ -459,7 +454,6 @@ void OpenNI2Driver::newIRFrameCallback(openni2::image_t* image)
 
 void OpenNI2Driver::newColorFrameCallback(openni2::image_t* image)
 {
-  std::cout << "publish color callback\n";
 
   if ((++data_skip_color_counter_)%data_skip_==0)
   {
@@ -470,10 +464,12 @@ void OpenNI2Driver::newColorFrameCallback(openni2::image_t* image)
     //  image->header.frame_id = color_frame_id_;
     //  image->header.stamp = image->header.stamp + color_time_offset_;
 
-        lcm_->publish("COLOR", image);
-    //  pub_color_.publish(image, getColorCameraInfo(image->width, image->height, image->header.stamp));
-
+        //lcm_->publish("COLOR", image);
         last_color_image_ = *image;
+        if(!last_color_image_init_){
+          std::cout << "Received first color image from device\n";
+        }
+
         last_color_image_init_ = true;
     }
   }
@@ -484,7 +480,6 @@ void OpenNI2Driver::newColorFrameCallback(openni2::image_t* image)
 
 void OpenNI2Driver::newDepthFrameCallback(openni2::image_t* image)
 {
-  std::cout << "publish depth callback\n";
 
   if ((++data_skip_depth_counter_)%data_skip_==0)
   {
@@ -502,6 +497,8 @@ void OpenNI2Driver::newDepthFrameCallback(openni2::image_t* image)
           if (data[i] != 0)
                 data[i] += z_offset_mm_;
       }
+
+
 
       if (fabs(z_scaling_ - 1.0) > 1e-6)
       {
@@ -523,18 +520,18 @@ void OpenNI2Driver::newDepthFrameCallback(openni2::image_t* image)
       //  cam_info = getDepthCameraInfo(image->width,image->height, image->header.stamp);
       //}
 
-      lcm_->publish("DEPTH", image);
+      //lcm_->publish("DEPTH", image);
 
       if (last_color_image_init_){
-      openni2::images_t images;
-      images.utime = image->utime;
-      images.n_images = 2;
-      images.images.push_back(last_color_image_);
-      images.images.push_back(*image);
-      images.image_types.push_back( 0 ) ;//LEFT = 0
-      images.image_types.push_back( 4 ) ;//DEPTH_MM = 4
+        openni2::images_t images;
+        images.utime = image->utime;
+        images.n_images = 2;
+        images.images.push_back(last_color_image_);
+        images.images.push_back(*image);
+        images.image_types.push_back( 0 ) ;//LEFT = 0
+        images.image_types.push_back( 4 ) ;//DEPTH_MM = 4
 
-      lcm_->publish("CAMERA", &images);
+        lcm_->publish("CAMERA", &images);
       }
       //if (depth_raw_subscribers_)
       //{

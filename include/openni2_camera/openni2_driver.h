@@ -55,7 +55,6 @@
 //#include "openni2_camera/GetSerial.h"
 
 #include <lcm/lcm-cpp.hpp>
-//#include <ros/ros.h>
 
 namespace openni2_wrapper
 {
@@ -67,22 +66,22 @@ public:
 
 private:
   boost::shared_ptr<lcm::LCM> lcm_;
-//  typedef openni2_camera::OpenNI2Config Config;
-//  typedef dynamic_reconfigure::Server<Config> ReconfigureServer;
+  //typedef openni2_camera::OpenNI2Config Config;
+  //  typedef dynamic_reconfigure::Server<Config> ReconfigureServer;
 
-//  void newIRFrameCallback(sensor_msgs::ImagePtr image);
-//  void newColorFrameCallback(sensor_msgs::ImagePtr image);
-//  void newDepthFrameCallback(sensor_msgs::ImagePtr image);
+  //  void newIRFrameCallback(sensor_msgs::ImagePtr image);
+  //  void newColorFrameCallback(sensor_msgs::ImagePtr image);
+  //  void newDepthFrameCallback(sensor_msgs::ImagePtr image);
 
   void newIRFrameCallback(openni2::image_t* image);
   void newColorFrameCallback(openni2::image_t* image);
   void newDepthFrameCallback(openni2::image_t* image);
 
   // Methods to get calibration parameters for the various cameras
-//  sensor_msgs::CameraInfoPtr getDefaultCameraInfo(int width, int height, double f) const;
-//  sensor_msgs::CameraInfoPtr getColorCameraInfo(int width, int height, ros::Time time) const;
-//  sensor_msgs::CameraInfoPtr getIRCameraInfo(int width, int height, ros::Time time) const;
-//  sensor_msgs::CameraInfoPtr getDepthCameraInfo(int width, int height, ros::Time time) const;
+  //  sensor_msgs::CameraInfoPtr getDefaultCameraInfo(int width, int height, double f) const;
+  //  sensor_msgs::CameraInfoPtr getColorCameraInfo(int width, int height, ros::Time time) const;
+  //  sensor_msgs::CameraInfoPtr getIRCameraInfo(int width, int height, ros::Time time) const;
+  //  sensor_msgs::CameraInfoPtr getDepthCameraInfo(int width, int height, ros::Time time) const;
 
   void readConfigFromParameterServer();
 
@@ -96,7 +95,7 @@ private:
   void depthConnectCb();
   void irConnectCb();
 
-//  bool getSerialCb(openni2_camera::GetSerialRequest& req, openni2_camera::GetSerialResponse& res);
+  //  bool getSerialCb(openni2_camera::GetSerialRequest& req, openni2_camera::GetSerialResponse& res);
 
   void configCb(uint32_t level);//Config &config, uint32_t level);
 
@@ -105,14 +104,14 @@ private:
   void genVideoModeTableMap();
   int lookupVideoModeFromDynConfig(int mode_nr, OpenNI2VideoMode& video_mode);
 
-//  sensor_msgs::ImageConstPtr rawToFloatingPointConversion(sensor_msgs::ImageConstPtr raw_image);
+  //  sensor_msgs::ImageConstPtr rawToFloatingPointConversion(sensor_msgs::ImageConstPtr raw_image);
 
   void setIRVideoMode(const OpenNI2VideoMode& ir_video_mode);
   void setColorVideoMode(const OpenNI2VideoMode& color_video_mode);
   void setDepthVideoMode(const OpenNI2VideoMode& depth_video_mode);
 
-//  ros::NodeHandle& nh_;
-//  ros::NodeHandle& pnh_;
+  //  ros::NodeHandle& nh_;
+  //  ros::NodeHandle& pnh_;
 
   boost::shared_ptr<OpenNI2DeviceManager> device_manager_;
   boost::shared_ptr<OpenNI2Device> device_;
@@ -120,19 +119,19 @@ private:
   std::string device_id_;
 
   /** \brief get_serial server*/
-//  ros::ServiceServer get_serial_server;
+  //  ros::ServiceServer get_serial_server;
 
   /** \brief reconfigure server*/
-//  boost::shared_ptr<ReconfigureServer> reconfigure_server_;
+  //  boost::shared_ptr<ReconfigureServer> reconfigure_server_;
   bool config_init_;
 
   boost::mutex connect_mutex_;
   // published topics
-//  image_transport::CameraPublisher pub_color_;
-//  image_transport::CameraPublisher pub_depth_;
-//  image_transport::CameraPublisher pub_depth_raw_;
-//  image_transport::CameraPublisher pub_ir_;
-//  ros::Publisher pub_projector_info_;
+  //  image_transport::CameraPublisher pub_color_;
+  //  image_transport::CameraPublisher pub_depth_;
+  //  image_transport::CameraPublisher pub_depth_raw_;
+  //  image_transport::CameraPublisher pub_ir_;
+  //  ros::Publisher pub_projector_info_;
 
   /** \brief Camera info manager objects. */
 //  boost::shared_ptr<camera_info_manager::CameraInfoManager> color_info_manager_, ir_info_manager_;
@@ -158,9 +157,9 @@ private:
   int z_offset_mm_;
   double z_scaling_;
 
-//  ros::Duration ir_time_offset_;
-//  ros::Duration color_time_offset_;
-//  ros::Duration depth_time_offset_;
+  //  ros::Duration ir_time_offset_;
+  //  ros::Duration color_time_offset_;
+  //  ros::Duration depth_time_offset_;
 
   int data_skip_;
 
@@ -180,7 +179,7 @@ private:
 
   openni2::image_t last_color_image_;
   bool last_color_image_init_;
-//  Config old_config_;
+  //Config old_config_;
 };
 
 }

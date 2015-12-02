@@ -32,87 +32,17 @@
 #include "openni2_camera/openni2_driver.h"
 #include <boost/thread/thread.hpp>
 #include <lcm/lcm-cpp.hpp>
-
 int main(int argc, char **argv){
-
-//  ros::init(argc, argv, "openni2_camera");
-//  ros::NodeHandle n;
-//  ros::NodeHandle pnh("~");
 
   boost::shared_ptr<lcm::LCM> lcm(new lcm::LCM);
   if(!lcm->good()){
     std::cerr <<"ERROR: lcm is not good()" <<std::endl;
   }
 
-  std::cout << "a\n";
   openni2_wrapper::OpenNI2Driver drv(lcm);//n, pnh);
-  std::cout << "b\n";
 
-    boost::this_thread::sleep(boost::posix_time::milliseconds(10000));
-//  ros::spin();
-//  while (1==1);
+  //boost::this_thread::sleep(boost::posix_time::milliseconds(1E12));
+  while (1==1);
 
   return 0;
 }
-
-/*
-
-
-
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <poll.h>
-#include <lcmtypes/bot_core.h>
-#include <bot_core/lcm_util.h>
-#include <bot_core/signal_pipe.h>
-
-#include "openni2_camera/openni2_driver.h"
-//#include "kinectOpenniLCM.h"
-
-typedef struct {
-    lcm_t *lcm;
-    openni2_wrapper::OpenNI2Driver * kinectOpenniLCM;
-} app_t;
-
-static void
-app_run(app_t *self)
-{
-  GMainLoop *mainloop = g_main_loop_new(NULL, FALSE);
-  bot_glib_mainloop_attach_lcm(self->lcm);
-  bot_signal_pipe_glib_quit_on_kill(mainloop);
-  
-  g_main_loop_run(mainloop);
-  
-  printf("main: exiting\n");
-  
-  g_main_loop_unref(mainloop);
-}
-
-static void
-app_destroy(app_t *self)
-{
-  delete self->kinectOpenniLCM;
-  lcm_destroy(self->lcm);
-  free(self);
-}
-
-int main(int argc, char **argv)
-{
-    setlinebuf(stdout);    
-
-    g_thread_init(NULL);
-
-    app_t *app = (app_t*) calloc(1, sizeof(app_t));
-    app->lcm = bot_lcm_get_global(NULL);
-    app->kinectOpenniLCM = new openni2_wrapper::OpenNI2Driver(0);
-
-    app_run(app);
-    app_destroy(app);
-
-    return 0;
-}
-
-
-*/
