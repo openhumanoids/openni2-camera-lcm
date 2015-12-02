@@ -45,17 +45,18 @@ int ir_counter_ = 0;
 int color_counter_ = 0;
 int depth_counter_ = 0;
 
-void IRCallback(openni2::image_t image)
+void IRCallback(openni2::image_t* image)
 {
   ++ir_counter_;
 }
 
-void ColorCallback(openni2::image_t image)
+void ColorCallback(openni2::image_t* image)
 {
+  std::cout << "c\n";
   ++color_counter_;
 }
 
-void DepthCallback(openni2::image_t image)
+void DepthCallback(openni2::image_t* image)
 {
   ++depth_counter_;
 }

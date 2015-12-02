@@ -85,7 +85,7 @@ add_executable(openni2_camera_node
 target_link_libraries(openni2_camera_node openni2_driver_lib ${catkin_LIBRARIES} ${Boost_LIBRARIES} )
 add_dependencies(openni2_camera_node ${PROJECT_NAME}_gencfg ${PROJECT_NAME}_generate_messages_cpp)
 
-
+pods_use_pkg_config_packages ( openni2_camera_node lcm bot2-core glib-2.0)
 
 add_executable(list_devices
    src/list_devices.cpp

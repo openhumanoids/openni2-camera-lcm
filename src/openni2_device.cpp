@@ -43,6 +43,7 @@
 #include <boost/make_shared.hpp>
 
 #include <string>
+#include <iostream>
 
 namespace openni2_wrapper
 {
@@ -258,9 +259,12 @@ void OpenNI2Device::startIRStream()
 void OpenNI2Device::startColorStream()
 {
   boost::shared_ptr<openni::VideoStream> stream = getColorVideoStream();
+  std::cout << "start color xxxxxxxxxxxxxxxxx\n";
 
   if (stream)
   {
+  std::cout << "stream color xxxxxxxxxxxxxxxxx\n";
+
     stream->setMirroringEnabled(false);
     stream->start();
     stream->addNewFrameListener(color_frame_listener.get());
@@ -270,9 +274,11 @@ void OpenNI2Device::startColorStream()
 void OpenNI2Device::startDepthStream()
 {
   boost::shared_ptr<openni::VideoStream> stream = getDepthVideoStream();
+  std::cout << "start depth xxxxxxxxxxxxxxxxx\n";
 
   if (stream)
   {
+  std::cout << "stream depth xxxxxxxxxxxxxxxxx\n";
     stream->setMirroringEnabled(false);
     stream->start();
     stream->addNewFrameListener(depth_frame_listener.get());

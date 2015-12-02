@@ -66,7 +66,7 @@ void OpenNI2FrameListener::onNewFrame(openni::VideoStream& stream)
   if (m_frame.isValid() && callback_)
   {
 //    sensor_msgs::ImagePtr image(new sensor_msgs::Image);
-      openni2::image_t image;
+      openni2::image_t* image(new openni2::image_t);
 
     //ros::Time ros_now = ros::Time::now();
 
@@ -99,8 +99,8 @@ void OpenNI2FrameListener::onNewFrame(openni::VideoStream& stream)
       prev_time_stamp_ = corrected_timestamp;
     }
 
-//    image->width = m_frame.getWidth();
-//    image->height = m_frame.getHeight();
+    image->width = m_frame.getWidth();
+    image->height = m_frame.getHeight();
 
     std::size_t data_size = m_frame.getDataSize();
 
@@ -110,47 +110,55 @@ void OpenNI2FrameListener::onNewFrame(openni::VideoStream& stream)
 //    image->is_bigendian = 0;
 
     const openni::VideoMode& video_mode = m_frame.getVideoMode();
-/*    switch (video_mode.getPixelFormat())
+    switch (video_mode.getPixelFormat())
     {
       case openni::PIXEL_FORMAT_DEPTH_1_MM:
-        image->encoding = sensor_msgs::image_encodings::TYPE_16UC1;
-        image->step = sizeof(unsigned char) * 2 * image->width;
+        printf( "\nme got data 1mm\n");
+        //image->encoding = sensor_msgs::image_encodings::TYPE_16UC1;
+        //image->step = sizeof(unsigned char) * 2 * image->width;
         break;
       case openni::PIXEL_FORMAT_DEPTH_100_UM:
-        image->encoding = sensor_msgs::image_encodings::TYPE_16UC1;
-        image->step = sizeof(unsigned char) * 2 * image->width;
+        printf( "me got data 100um\n");
+        //image->encoding = sensor_msgs::image_encodings::TYPE_16UC1;
+        //image->step = sizeof(unsigned char) * 2 * image->width;
         break;
       case openni::PIXEL_FORMAT_SHIFT_9_2:
-        image->encoding = sensor_msgs::image_encodings::TYPE_16UC1;
-        image->step = sizeof(unsigned char) * 2 * image->width;
+        printf( "me got data 92\n");
+        //image->encoding = sensor_msgs::image_encodings::TYPE_16UC1;
+        //image->step = sizeof(unsigned char) * 2 * image->width;
         break;
       case openni::PIXEL_FORMAT_SHIFT_9_3:
-        image->encoding = sensor_msgs::image_encodings::TYPE_16UC1;
-        image->step = sizeof(unsigned char) * 2 * image->width;
+        printf( "me got data 93\n");
+        //image->encoding = sensor_msgs::image_encodings::TYPE_16UC1;
+        //image->step = sizeof(unsigned char) * 2 * image->width;
         break;
 
       case openni::PIXEL_FORMAT_RGB888:
-        image->encoding = sensor_msgs::image_encodings::RGB8;
-        image->step = sizeof(unsigned char) * 3 * image->width;
+        printf( "\nme got data 88\n");
+        //image->encoding = sensor_msgs::image_encodings::RGB8;
+        //image->step = sizeof(unsigned char) * 3 * image->width;
         break;
       case openni::PIXEL_FORMAT_YUV422:
-        image->encoding = sensor_msgs::image_encodings::YUV422;
-        image->step = sizeof(unsigned char) * 4 * image->width;
+        printf( "me got data 422\n");
+        //image->encoding = sensor_msgs::image_encodings::YUV422;
+        //image->step = sizeof(unsigned char) * 4 * image->width;
         break;
       case openni::PIXEL_FORMAT_GRAY8:
-        image->encoding = sensor_msgs::image_encodings::MONO8;
-        image->step = sizeof(unsigned char) * 1 * image->width;
+        printf( "me got data gray8\n");
+        //image->encoding = sensor_msgs::image_encodings::MONO8;
+        //image->step = sizeof(unsigned char) * 1 * image->width;
         break;
       case openni::PIXEL_FORMAT_GRAY16:
-        image->encoding = sensor_msgs::image_encodings::MONO16;
-        image->step = sizeof(unsigned char) * 2 * image->width;
+        printf( "me got data gtay16\n");
+        //image->encoding = sensor_msgs::image_encodings::MONO16;
+        //image->step = sizeof(unsigned char) * 2 * image->width;
         break;
       case openni::PIXEL_FORMAT_JPEG:
+        printf( "me got data jpeg\n");
       default:
-        ROS_ERROR("Invalid image encoding");
+        printf("Invalid image encoding");
         break;
     }
-*/
 
     callback_(image);
   }

@@ -38,6 +38,7 @@
 #include <boost/function.hpp>
 
 //#include <sensor_msgs/Image.h>
+#include <lcmtypes/openni2/image_t.hpp>
 
 //#include <dynamic_reconfigure/server.h>
 //#include <openni2_camera/OpenNI2Config.h>
@@ -61,7 +62,7 @@ namespace openni2_wrapper
 class OpenNI2Driver
 {
 public:
-  OpenNI2Driver();//ros::NodeHandle& n, ros::NodeHandle& pnh) ;
+  OpenNI2Driver(int temp);//ros::NodeHandle& n, ros::NodeHandle& pnh) ;
 
 private:
 //  typedef openni2_camera::OpenNI2Config Config;
@@ -70,6 +71,10 @@ private:
 //  void newIRFrameCallback(sensor_msgs::ImagePtr image);
 //  void newColorFrameCallback(sensor_msgs::ImagePtr image);
 //  void newDepthFrameCallback(sensor_msgs::ImagePtr image);
+
+  void newIRFrameCallback(openni2::image_t* image);
+  void newColorFrameCallback(openni2::image_t* image);
+  void newDepthFrameCallback(openni2::image_t* image);
 
   // Methods to get calibration parameters for the various cameras
 //  sensor_msgs::CameraInfoPtr getDefaultCameraInfo(int width, int height, double f) const;
@@ -91,9 +96,9 @@ private:
 
 //  bool getSerialCb(openni2_camera::GetSerialRequest& req, openni2_camera::GetSerialResponse& res);
 
-//  void configCb(Config &config, uint32_t level);
+  void configCb(uint32_t level);//Config &config, uint32_t level);
 
-//  void applyConfigToOpenNIDevice();
+  void applyConfigToOpenNIDevice();
 
   void genVideoModeTableMap();
   int lookupVideoModeFromDynConfig(int mode_nr, OpenNI2VideoMode& video_mode);
