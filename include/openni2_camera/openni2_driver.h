@@ -52,6 +52,7 @@
 #include "openni2_camera/openni2_device_manager.h"
 #include "openni2_camera/openni2_device.h"
 #include "openni2_camera/openni2_video_mode.h"
+#include "jpeg-utils-ijg.h"
 //#include "openni2_camera/GetSerial.h"
 
 #include <lcm/lcm-cpp.hpp>
@@ -73,9 +74,9 @@ private:
   //  void newColorFrameCallback(sensor_msgs::ImagePtr image);
   //  void newDepthFrameCallback(sensor_msgs::ImagePtr image);
 
-  void newIRFrameCallback(openni2::image_t* image);
-  void newColorFrameCallback(openni2::image_t* image);
-  void newDepthFrameCallback(openni2::image_t* image);
+  void newIRFrameCallback(boost::shared_ptr<openni2::image_t> image);
+  void newColorFrameCallback(boost::shared_ptr<openni2::image_t> image);
+  void newDepthFrameCallback(boost::shared_ptr<openni2::image_t> image);
 
   // Methods to get calibration parameters for the various cameras
   //  sensor_msgs::CameraInfoPtr getDefaultCameraInfo(int width, int height, double f) const;
@@ -180,6 +181,10 @@ private:
   openni2::image_t last_color_image_;
   bool last_color_image_init_;
   //Config old_config_;
+
+  uint8_t* image_buf_;
+  int image_buf_size_;
+  int jpeg_quality_;
 };
 
 }

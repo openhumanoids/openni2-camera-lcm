@@ -55,6 +55,13 @@ OpenNI2Driver::OpenNI2Driver(boost::shared_ptr<lcm::LCM>& lcm) ://ros::NodeHandl
     last_color_image_init_(false)
 {
 
+  image_buf_size_ = 640 * 480 * 10;
+  if (0 != posix_memalign((void**) &image_buf_, 16, image_buf_size_)) {
+      fprintf(stderr, "Error allocating image buffer\n");
+      //return 1;
+  }
+  jpeg_quality_ = 94;
+
   genVideoModeTableMap();
 
   readConfigFromParameterServer();
@@ -434,7 +441,7 @@ void OpenNI2Driver::irConnectCb()
 }
 
 
-void OpenNI2Driver::newIRFrameCallback(openni2::image_t* image)
+void OpenNI2Driver::newIRFrameCallback(boost::shared_ptr<openni2::image_t> image)
 {
   if ((++data_skip_ir_counter_)%data_skip_==0)
   {
@@ -452,7 +459,7 @@ void OpenNI2Driver::newIRFrameCallback(openni2::image_t* image)
 
 
 
-void OpenNI2Driver::newColorFrameCallback(openni2::image_t* image)
+void OpenNI2Driver::newColorFrameCallback(boost::shared_ptr<openni2::image_t> image)
 {
 
   if ((++data_skip_color_counter_)%data_skip_==0)
@@ -464,7 +471,8 @@ void OpenNI2Driver::newColorFrameCallback(openni2::image_t* image)
     //  image->header.frame_id = color_frame_id_;
     //  image->header.stamp = image->header.stamp + color_time_offset_;
 
-        //lcm_->publish("COLOR", image);
+
+        lcm_->publish("COLOR", image.get());
         last_color_image_ = *image;
         if(!last_color_image_init_){
           std::cout << "Received first color image from device\n";
@@ -478,7 +486,7 @@ void OpenNI2Driver::newColorFrameCallback(openni2::image_t* image)
 
 
 
-void OpenNI2Driver::newDepthFrameCallback(openni2::image_t* image)
+void OpenNI2Driver::newDepthFrameCallback(boost::shared_ptr<openni2::image_t> image)
 {
 
   if ((++data_skip_depth_counter_)%data_skip_==0)
@@ -520,7 +528,7 @@ void OpenNI2Driver::newDepthFrameCallback(openni2::image_t* image)
       //  cam_info = getDepthCameraInfo(image->width,image->height, image->header.stamp);
       //}
 
-      //lcm_->publish("DEPTH", image);
+      lcm_->publish("DEPTH", image.get());
 
       if (last_color_image_init_){
         openni2::images_t images;

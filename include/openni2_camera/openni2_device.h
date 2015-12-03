@@ -58,7 +58,7 @@ class SensorInfo;
 namespace openni2_wrapper
 {
 
-typedef boost::function<void(openni2::image_t* image)> FrameCallbackFunction;
+typedef boost::function<void(boost::shared_ptr<openni2::image_t> image)> FrameCallbackFunction;
 
 class OpenNI2FrameListener;
 
