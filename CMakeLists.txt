@@ -50,7 +50,7 @@ target_link_libraries(test-wrapper openni2_wrapper ${Boost_LIBRARIES})
 ############### Wrapper Library #################
 add_library(openni2_driver_lib src/openni2_driver.cpp)
 pods_install_libraries(openni2_wrapper)
-target_link_libraries(openni2_driver_lib openni2_wrapper  ${Boost_LIBRARIES} jpeg)
+target_link_libraries(openni2_driver_lib openni2_wrapper  ${Boost_LIBRARIES} jpeg z)
 pods_install_libraries(openni2_driver_lib)
 #add_dependencies(openni2_driver_lib ${PROJECT_NAME}_gencfg)
 

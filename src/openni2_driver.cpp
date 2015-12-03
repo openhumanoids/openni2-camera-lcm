@@ -38,11 +38,15 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp>
 
+#include "openni2_camera/jpeg-utils-ijg.h"
+#include <zlib.h>
+
 namespace openni2_wrapper
 {
 
-OpenNI2Driver::OpenNI2Driver(boost::shared_ptr<lcm::LCM>& lcm) ://ros::NodeHandle& n, ros::NodeHandle& pnh) :
+OpenNI2Driver::OpenNI2Driver(boost::shared_ptr<lcm::LCM>& lcm, const CommandLineConfig& cl_cfg) :
     lcm_(lcm),
+    cl_cfg_(cl_cfg),
     device_manager_(OpenNI2DeviceManager::getSingelton()),
     config_init_(false), // was false
     data_skip_ir_counter_(0),
@@ -60,7 +64,11 @@ OpenNI2Driver::OpenNI2Driver(boost::shared_ptr<lcm::LCM>& lcm) ://ros::NodeHandl
       fprintf(stderr, "Error allocating image buffer\n");
       //return 1;
   }
-  jpeg_quality_ = 94;
+
+  // allocate space for zlib compressing depth data
+  depth_compress_buf_size_ = 640 * 480 * sizeof(int16_t) * 4;
+  depth_compress_buf_ = (uint8_t*) malloc(depth_compress_buf_size_);
+
 
   genVideoModeTableMap();
 
@@ -472,13 +480,29 @@ void OpenNI2Driver::newColorFrameCallback(boost::shared_ptr<openni2::image_t> im
     //  image->header.stamp = image->header.stamp + color_time_offset_;
 
 
-        lcm_->publish("COLOR", image.get());
-        last_color_image_ = *image;
-        if(!last_color_image_init_){
-          std::cout << "Received first color image from device\n";
-        }
+      if(cl_cfg_.use_jpeg){
+        int compressed_size =  image->height*image->row_stride;//image_buf_size;
+        int compression_status = jpegijg_compress_8u_rgb(image->data.data(), image->width, image->height, image->row_stride,
+                                                       image_buf_, &compressed_size, cl_cfg_.jpeg_quality);
 
-        last_color_image_init_ = true;
+        if (0 != compression_status) {
+            fprintf(stderr, "JPEG compression failed...\n");
+        }
+        memcpy(&image->data[0], image_buf_, compressed_size);
+        image->size = compressed_size;
+        image->pixelformat = openni2::image_t::PIXEL_FORMAT_MJPEG;
+      }
+
+      if (cl_cfg_.image_standalone)
+        lcm_->publish(cl_cfg_.msg_channel +"_RGB", image.get());
+
+      // Cache for publishing with depth message
+      last_color_image_ = *image;
+      if(!last_color_image_init_){
+        std::cout << "Received first color image from device\n";
+      }
+      last_color_image_init_ = true;
+
     }
   }
 
@@ -528,23 +552,38 @@ void OpenNI2Driver::newDepthFrameCallback(boost::shared_ptr<openni2::image_t> im
       //  cam_info = getDepthCameraInfo(image->width,image->height, image->header.stamp);
       //}
 
-      lcm_->publish("DEPTH", image.get());
 
-      if (last_color_image_init_){
+      if(cl_cfg_.use_zlib == 1){
+        int uncompressed_size = image->height * image->width * sizeof(short);
+        unsigned long compressed_size = depth_compress_buf_size_;
+        compress2(depth_compress_buf_, &compressed_size, (const Bytef*) image->data.data(), uncompressed_size,
+                  Z_BEST_SPEED);  
+        image->size =(int)compressed_size;
+        memcpy(&image->data[0], depth_compress_buf_, compressed_size);
+      }
+
+      if (cl_cfg_.depth_standalone)
+        lcm_->publish( cl_cfg_.msg_channel + "_DEPTH", image.get());
+
+      if (last_color_image_init_ && !cl_cfg_.skip_combined){
         openni2::images_t images;
         images.utime = image->utime;
         images.n_images = 2;
         images.images.push_back(last_color_image_);
         images.images.push_back(*image);
         images.image_types.push_back( 0 ) ;//LEFT = 0
-        images.image_types.push_back( 4 ) ;//DEPTH_MM = 4
 
-        lcm_->publish("CAMERA", &images);
+        if (cl_cfg_.use_zlib){
+          images.image_types.push_back( 6 ) ;//DEPTH_MM_ZIPPED = 4
+        }else{
+          images.image_types.push_back( 4 ) ;//DEPTH_MM = 4
+        }
+
+        lcm_->publish( cl_cfg_.msg_channel, &images);
       }
       //if (depth_raw_subscribers_)
       //{
       //  pub_depth_raw_.publish(image, cam_info);
-      //  lcm_->publish("COLOR", image);
       //}
 
       //if (depth_subscribers_ )

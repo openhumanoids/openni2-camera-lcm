@@ -52,7 +52,6 @@
 #include "openni2_camera/openni2_device_manager.h"
 #include "openni2_camera/openni2_device.h"
 #include "openni2_camera/openni2_video_mode.h"
-#include "jpeg-utils-ijg.h"
 //#include "openni2_camera/GetSerial.h"
 
 #include <lcm/lcm-cpp.hpp>
@@ -60,12 +59,25 @@
 namespace openni2_wrapper
 {
 
+struct CommandLineConfig
+{
+  bool verbose;
+  bool use_jpeg;
+  bool use_zlib;
+  int jpeg_quality;
+  bool image_standalone;
+  bool depth_standalone;
+  bool skip_combined;
+  std::string msg_channel;
+};
+
 class OpenNI2Driver
 {
 public:
-  OpenNI2Driver(boost::shared_ptr<lcm::LCM>& lcm_);//ros::NodeHandle& n, ros::NodeHandle& pnh) ;
+  OpenNI2Driver(boost::shared_ptr<lcm::LCM>& lcm, const CommandLineConfig& cl_cfg);
 
 private:
+  const CommandLineConfig cl_cfg_;
   boost::shared_ptr<lcm::LCM> lcm_;
   //typedef openni2_camera::OpenNI2Config Config;
   //  typedef dynamic_reconfigure::Server<Config> ReconfigureServer;
@@ -182,9 +194,15 @@ private:
   bool last_color_image_init_;
   //Config old_config_;
 
+  // Compression Buffers:
   uint8_t* image_buf_;
   int image_buf_size_;
-  int jpeg_quality_;
+
+  uint16_t* depth_unpack_buf_;
+  int depth_unpack_buf_size_;
+
+  uint8_t* depth_compress_buf_;
+  int depth_compress_buf_size_;
 };
 
 }
