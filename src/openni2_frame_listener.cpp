@@ -73,7 +73,7 @@ void OpenNI2FrameListener::onNewFrame(openni::VideoStream& stream)
 
   if (m_frame.isValid() && callback_)
   {
-      openni2::image_t* image(new openni2::image_t);
+      boost::shared_ptr<openni2::image_t> image(new openni2::image_t);
 
       int64_t ros_now = _timestamp_now();//ros::Time::now();
 

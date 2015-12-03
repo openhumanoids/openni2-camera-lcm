@@ -59,12 +59,25 @@
 namespace openni2_wrapper
 {
 
+struct CommandLineConfig
+{
+  bool verbose;
+  bool use_jpeg;
+  bool use_zlib;
+  int jpeg_quality;
+  bool image_standalone;
+  bool depth_standalone;
+  bool skip_combined;
+  std::string msg_channel;
+};
+
 class OpenNI2Driver
 {
 public:
-  OpenNI2Driver(boost::shared_ptr<lcm::LCM>& lcm_);//ros::NodeHandle& n, ros::NodeHandle& pnh) ;
+  OpenNI2Driver(boost::shared_ptr<lcm::LCM>& lcm, const CommandLineConfig& cl_cfg);
 
 private:
+  const CommandLineConfig cl_cfg_;
   boost::shared_ptr<lcm::LCM> lcm_;
   //typedef openni2_camera::OpenNI2Config Config;
   //  typedef dynamic_reconfigure::Server<Config> ReconfigureServer;
@@ -73,9 +86,9 @@ private:
   //  void newColorFrameCallback(sensor_msgs::ImagePtr image);
   //  void newDepthFrameCallback(sensor_msgs::ImagePtr image);
 
-  void newIRFrameCallback(openni2::image_t* image);
-  void newColorFrameCallback(openni2::image_t* image);
-  void newDepthFrameCallback(openni2::image_t* image);
+  void newIRFrameCallback(boost::shared_ptr<openni2::image_t> image);
+  void newColorFrameCallback(boost::shared_ptr<openni2::image_t> image);
+  void newDepthFrameCallback(boost::shared_ptr<openni2::image_t> image);
 
   // Methods to get calibration parameters for the various cameras
   //  sensor_msgs::CameraInfoPtr getDefaultCameraInfo(int width, int height, double f) const;
@@ -180,6 +193,16 @@ private:
   openni2::image_t last_color_image_;
   bool last_color_image_init_;
   //Config old_config_;
+
+  // Compression Buffers:
+  uint8_t* image_buf_;
+  int image_buf_size_;
+
+  uint16_t* depth_unpack_buf_;
+  int depth_unpack_buf_size_;
+
+  uint8_t* depth_compress_buf_;
+  int depth_compress_buf_size_;
 };
 
 }
