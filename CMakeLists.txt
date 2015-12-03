@@ -58,7 +58,7 @@ pods_install_libraries(openni2_driver_lib)
 add_executable(openni2-camera-lcm   ros/openni2_camera_node.cpp)
 target_link_libraries(openni2-camera-lcm openni2_driver_lib ${catkin_LIBRARIES} ${Boost_LIBRARIES} )
 add_dependencies(openni2-camera-lcm ${PROJECT_NAME}_gencfg ${PROJECT_NAME}_generate_messages_cpp)
-pods_use_pkg_config_packages ( openni2-camera-lcm lcm bot2-core glib-2.0)
+pods_use_pkg_config_packages ( openni2-camera-lcm lcm)
 pods_install_executables(openni2-camera-lcm)
 
 ############### Auxilary Processes #################
