@@ -69,6 +69,7 @@ struct CommandLineConfig
   bool depth_standalone;
   bool skip_combined;
   std::string msg_channel;
+  int data_skip;
 };
 
 class OpenNI2Driver
@@ -173,8 +174,6 @@ private:
   //  ros::Duration ir_time_offset_;
   //  ros::Duration color_time_offset_;
   //  ros::Duration depth_time_offset_;
-
-  int data_skip_;
 
   int data_skip_ir_counter_;
   int data_skip_color_counter_;
