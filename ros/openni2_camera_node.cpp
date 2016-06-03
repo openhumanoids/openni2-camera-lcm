@@ -45,6 +45,7 @@ int main(int argc, char **argv){
   cl_cfg.depth_standalone = false;
   cl_cfg.skip_combined = false;
   cl_cfg.msg_channel = "OPENNI_FRAME";
+  cl_cfg.data_skip = 1;
 
   ConciseArgs parser(argc, argv, "openni2-camera-lcm");
   parser.add(cl_cfg.verbose, "v", "verbose", "Verbose printf");
@@ -55,6 +56,7 @@ int main(int argc, char **argv){
   parser.add(cl_cfg.depth_standalone, "sd", "depth_standalone", "Publish Depth image individually");
   parser.add(cl_cfg.skip_combined, "sc", "skip_combined", "Don't publish RGB-D images message");
   parser.add(cl_cfg.msg_channel, "c", "msg_channel", "LCM Channel");
+  parser.add(cl_cfg.data_skip, "d", "data_skip", "Period been images (1 = don't skip, 0 skip all), use to select fps");
   parser.parse();
 
 

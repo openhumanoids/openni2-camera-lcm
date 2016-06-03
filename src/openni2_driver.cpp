@@ -240,8 +240,6 @@ lookupVideoModeFromDynConfig(5, depth_video_mode_);
 
 //  use_device_time_ = config.use_device_time;
 
-  data_skip_ = 1;// config.data_skip+1;
-
   applyConfigToOpenNIDevice();
 
   config_init_ = true;
@@ -451,7 +449,10 @@ void OpenNI2Driver::irConnectCb()
 
 void OpenNI2Driver::newIRFrameCallback(boost::shared_ptr<openni2::image_t> image)
 {
-  if ((++data_skip_ir_counter_)%data_skip_==0)
+  if (cl_cfg_.data_skip==0) // Return without doing any work
+    return;
+
+  if ((++data_skip_ir_counter_)%cl_cfg_.data_skip==0)
   {
     data_skip_ir_counter_ = 0;
 
@@ -469,8 +470,10 @@ void OpenNI2Driver::newIRFrameCallback(boost::shared_ptr<openni2::image_t> image
 
 void OpenNI2Driver::newColorFrameCallback(boost::shared_ptr<openni2::image_t> image)
 {
+  if (cl_cfg_.data_skip==0) // Return without doing any work
+    return;
 
-  if ((++data_skip_color_counter_)%data_skip_==0)
+  if ((++data_skip_color_counter_)%cl_cfg_.data_skip==0)
   {
     data_skip_color_counter_ = 0;
 
@@ -512,8 +515,10 @@ void OpenNI2Driver::newColorFrameCallback(boost::shared_ptr<openni2::image_t> im
 
 void OpenNI2Driver::newDepthFrameCallback(boost::shared_ptr<openni2::image_t> image)
 {
+  if (cl_cfg_.data_skip==0) // Return without doing any work
+    return;
 
-  if ((++data_skip_depth_counter_)%data_skip_==0)
+  if ((++data_skip_depth_counter_)%cl_cfg_.data_skip==0)
   {
 
     data_skip_depth_counter_ = 0;
