@@ -63,7 +63,7 @@ struct CommandLineConfig
 {
   bool verbose;
   bool use_jpeg;
-  bool use_zlib;
+  int use_zlib;
   int jpeg_quality;
   bool image_standalone;
   bool depth_standalone;

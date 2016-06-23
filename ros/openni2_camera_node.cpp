@@ -38,8 +38,8 @@ int main(int argc, char **argv){
 
   openni2_wrapper::CommandLineConfig cl_cfg;
   cl_cfg.verbose = false;
-  cl_cfg.use_jpeg = false;
-  cl_cfg.use_zlib = false;
+  cl_cfg.use_jpeg = true;
+  cl_cfg.use_zlib = 1;
   cl_cfg.jpeg_quality = 94;
   cl_cfg.image_standalone = false;
   cl_cfg.depth_standalone = false;
@@ -49,9 +49,9 @@ int main(int argc, char **argv){
 
   ConciseArgs parser(argc, argv, "openni2-camera-lcm");
   parser.add(cl_cfg.verbose, "v", "verbose", "Verbose printf");
-  parser.add(cl_cfg.use_jpeg, "j", "use_jpeg", "JPEG-compress RGB images");
-  parser.add(cl_cfg.use_zlib, "z", "use_zlib", "ZLib compress depth images");
-  parser.add(cl_cfg.jpeg_quality, "q", "jpeg_quality", "JPEG compression quality (0-100, default 94)");
+  //parser.add(cl_cfg.use_jpeg, "j", "use_jpeg", "JPEG-compress RGB images"); // now implicit from quality
+  parser.add(cl_cfg.use_zlib, "z", "zlib", "depth compression (0-9), 0=no compression)");
+  parser.add(cl_cfg.jpeg_quality, "j", "jpeg", "JPEG quality (1-100), 100=compression");
   parser.add(cl_cfg.image_standalone, "si", "image_standalone", "Publish RGB image individually");
   parser.add(cl_cfg.depth_standalone, "sd", "depth_standalone", "Publish Depth image individually");
   parser.add(cl_cfg.skip_combined, "sc", "skip_combined", "Don't publish RGB-D images message");
@@ -59,6 +59,10 @@ int main(int argc, char **argv){
   parser.add(cl_cfg.data_skip, "d", "data_skip", "Period been images (1 = don't skip, 0 skip all), use to select fps");
   parser.parse();
 
+  if (cl_cfg.jpeg_quality == 100){
+    std::cout << "JPEG compression disabled, will not compress\n";
+    cl_cfg.use_jpeg = false;
+  }
 
   boost::shared_ptr<lcm::LCM> lcm(new lcm::LCM);
   if(!lcm->good()){
