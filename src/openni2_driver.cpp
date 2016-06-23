@@ -558,7 +558,7 @@ void OpenNI2Driver::newDepthFrameCallback(boost::shared_ptr<openni2::image_t> im
       //}
 
 
-      if(cl_cfg_.use_zlib == 1){
+      if(cl_cfg_.use_zlib > 0){
         int uncompressed_size = image->height * image->width * sizeof(short);
         unsigned long compressed_size = depth_compress_buf_size_;
         compress2(depth_compress_buf_, &compressed_size, (const Bytef*) image->data.data(), uncompressed_size,
@@ -578,7 +578,7 @@ void OpenNI2Driver::newDepthFrameCallback(boost::shared_ptr<openni2::image_t> im
         images.images.push_back(*image);
         images.image_types.push_back( 0 ) ;//LEFT = 0
 
-        if (cl_cfg_.use_zlib){
+        if (cl_cfg_.use_zlib > 0){
           images.image_types.push_back( 6 ) ;//DEPTH_MM_ZIPPED = 4
         }else{
           images.image_types.push_back( 4 ) ;//DEPTH_MM = 4
