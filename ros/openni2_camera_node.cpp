@@ -71,8 +71,9 @@ int main(int argc, char **argv){
 
   openni2_wrapper::OpenNI2Driver drv(lcm, cl_cfg);
 
-  //boost::this_thread::sleep(boost::posix_time::milliseconds(1E12));
-  while (1==1);
+  while(1==1) {
+    boost::this_thread::sleep(boost::posix_time::milliseconds(30));
+  }
 
   return 0;
 }
