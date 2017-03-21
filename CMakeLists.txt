@@ -17,9 +17,17 @@ find_package(Boost REQUIRED COMPONENTS system thread)
 
 find_package(PkgConfig)
 
-pkg_check_modules(PC_OPENNI2 libopenni2)
-if (NOT PC_OPENNI2_FOUND)
-  pkg_check_modules(PC_OPENNI2 REQUIRED openni2)
+
+if(APPLE)
+  # on mac you can install openni2 with homebrew but it doesn't come with a pkg-config .pc file
+  set(PC_OPENNI2_INCLUDE_DIRS /usr/local/include/ni2)
+  set(PC_OPENNI2_LIBRARY_DIRS /usr/local/lib/ni2)
+  set(PC_OPENNI2_LIBRARIES OpenNI2 jpeg lcm)
+else()
+  pkg_check_modules(PC_OPENNI2 libopenni2)
+  if (NOT PC_OPENNI2_FOUND)
+    pkg_check_modules(PC_OPENNI2 REQUIRED openni2)
+  endif()
 endif()
 
 include_directories(include 
@@ -66,9 +74,11 @@ add_executable(list-devices src/list_devices.cpp)
 target_link_libraries(list-devices openni2_wrapper)
 pods_install_executables(list-devices)
 
-add_executable(usb-reset src/usb_reset.c)
-pods_install_executables(usb-reset)
-
+if(NOT APPLE)
+  # this program includes a linux specific header
+  add_executable(usb-reset src/usb_reset.c)
+  pods_install_executables(usb-reset)
+endif()
 
 
 # bot-spy clone, needed to decode lcmtypes
