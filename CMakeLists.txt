@@ -17,6 +17,7 @@ find_package(Boost REQUIRED COMPONENTS system thread)
 
 find_package(PkgConfig)
 
+option(INSTALL_BOT_SPY "Install a bot-spy script to launch lcm-spy with this project's lcmtypes." ON)
 
 if(APPLE)
   # on mac you can install openni2 with homebrew but it doesn't come with a pkg-config .pc file
@@ -74,6 +75,7 @@ add_executable(list-devices src/list_devices.cpp)
 target_link_libraries(list-devices openni2_wrapper)
 pods_install_executables(list-devices)
 
+
 if(NOT APPLE)
   # this program includes a linux specific header
   add_executable(usb-reset src/usb_reset.c)
@@ -102,4 +104,6 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${script_name}
     "exec java -ea -cp \$CLASSPATH lcm.spy.Spy $*\n")
 
 # install it...
-install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${script_name} DESTINATION bin)
+if(INSTALL_BOT_SPY)
+  install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${script_name} DESTINATION bin)
+endif()
