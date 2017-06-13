@@ -238,6 +238,9 @@ lookupVideoModeFromDynConfig(5, depth_video_mode_);
 //  auto_exposure_ = config.auto_exposure;
  // auto_white_balance_ = config.auto_white_balance;
 
+  auto_exposure_ = true;
+  auto_white_balance_ = true;
+
 //  use_device_time_ = config.use_device_time;
 
   applyConfigToOpenNIDevice();
