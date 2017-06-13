@@ -238,7 +238,6 @@ lookupVideoModeFromDynConfig(5, depth_video_mode_);
 //  auto_exposure_ = config.auto_exposure;
  // auto_white_balance_ = config.auto_white_balance;
 
-  // In ROS these are read
   auto_exposure_ = true;
   auto_white_balance_ = true;
 
