@@ -50,7 +50,7 @@ add_library(openni2_wrapper
    src/openni2_video_mode.cpp
    src/jpeg-utils-ijg.c
 )
-target_link_libraries(openni2_wrapper  ${PC_OPENNI2_LIBRARIES} ${Boost_LIBRARIES} )
+target_link_libraries(openni2_wrapper  ${PC_OPENNI2_LIBRARIES} ${Boost_LIBRARIES} jpeg)
 pods_install_libraries(openni2_wrapper)
 
 add_executable(test-wrapper test/test_wrapper.cpp )
