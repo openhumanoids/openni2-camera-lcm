@@ -368,11 +368,7 @@ macro(pods_config_search_paths)
         else(${CMAKE_INSTALL_RPATH})
             set(CMAKE_INSTALL_RPATH ${LIBRARY_INSTALL_PATH})
         endif(${CMAKE_INSTALL_RPATH})
-
-        # for osx, which uses "install name" path rather than rpath
-        #set(CMAKE_INSTALL_NAME_DIR ${LIBRARY_OUTPUT_PATH})
-        set(CMAKE_INSTALL_NAME_DIR ${CMAKE_INSTALL_RPATH})
-        
+      
         # hack to force cmake always create install and clean targets 
         install(FILES DESTINATION)
         string(RANDOM LENGTH 32 __rand_target__name__)
