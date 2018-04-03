@@ -78,6 +78,7 @@ protected:
   std::string message_long_;
 };
 
+__attribute__((noreturn))
 inline void throwOpenNIException(const char* function, const char* file, unsigned line, const char* format, ...)
 {
   static char msg[1024];

@@ -45,8 +45,8 @@ namespace openni2_wrapper
 {
 
 OpenNI2Driver::OpenNI2Driver(boost::shared_ptr<lcm::LCM>& lcm, const CommandLineConfig& cl_cfg) :
-    lcm_(lcm),
     cl_cfg_(cl_cfg),
+    lcm_(lcm),
     device_manager_(OpenNI2DeviceManager::getSingelton()),
     config_init_(false), // was false
     data_skip_ir_counter_(0),
@@ -193,8 +193,6 @@ void OpenNI2Driver::advertiseROSTopics()
 
 void OpenNI2Driver::configCb(uint32_t level)//Config &config, uint32_t level)
 {
-  bool stream_reset = false;
-
   //depth_ir_offset_x_ = config.depth_ir_offset_x;
   //depth_ir_offset_y_ = config.depth_ir_offset_y;
   z_offset_mm_ = 0;// config.z_offset_mm;
@@ -533,9 +531,9 @@ void OpenNI2Driver::newDepthFrameCallback(boost::shared_ptr<openni2::image_t> im
       if (z_offset_mm_ != 0)
       {
         uint16_t* data = reinterpret_cast<uint16_t*>(&image->data[0]);
-        for (unsigned int i = 0; i < image->width * image->height; ++i)
+        for (int i = 0; i < image->width * image->height; ++i)
           if (data[i] != 0)
-                data[i] += z_offset_mm_;
+                data[i] += static_cast<uint16_t>(z_offset_mm_);
       }
 
 
@@ -543,7 +541,7 @@ void OpenNI2Driver::newDepthFrameCallback(boost::shared_ptr<openni2::image_t> im
       if (fabs(z_scaling_ - 1.0) > 1e-6)
       {
         uint16_t* data = reinterpret_cast<uint16_t*>(&image->data[0]);
-        for (unsigned int i = 0; i < image->width * image->height; ++i)
+        for (int i = 0; i < image->width * image->height; ++i)
           if (data[i] != 0)
                 data[i] = static_cast<uint16_t>(data[i] * z_scaling_);
       }
@@ -754,7 +752,7 @@ std::string OpenNI2Driver::resolveDeviceURI(const std::string& device_id) throw(
     int device_number;
     device_number_str >> device_number;
     int device_index = device_number - 1; // #1 refers to first device
-    if (device_index >= available_device_URIs->size() || device_index < 0)
+    if (device_index >= static_cast<int>(available_device_URIs->size()) || device_index < 0)
     {
       THROW_OPENNI_EXCEPTION(
           "Invalid device number %i, there are %zu devices connected.",
