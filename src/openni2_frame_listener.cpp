@@ -59,7 +59,7 @@ OpenNI2FrameListener::OpenNI2FrameListener() :
 {
 }
 
-bool OpenNI2FrameListener::setUseDeviceTimer(bool enable)
+void OpenNI2FrameListener::setUseDeviceTimer(bool enable)
 {
   user_device_timer_ = enable;
 
