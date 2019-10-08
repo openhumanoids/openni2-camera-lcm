@@ -69,7 +69,7 @@ target_link_libraries(openni2-camera-lcm openni2_driver_lib ${catkin_LIBRARIES} 
 add_dependencies(openni2-camera-lcm ${PROJECT_NAME}_gencfg ${PROJECT_NAME}_generate_messages_cpp)
 find_package(lcm QUIET)
 if(lcm_FOUND)
-  target_link_libraries(openni2-camera-lcm lcm::lcm)
+  target_link_libraries(openni2-camera-lcm lcm)
 else()
   pods_use_pkg_config_packages ( openni2-camera-lcm lcm)
 endif()
